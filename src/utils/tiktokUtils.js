@@ -5,6 +5,7 @@ const ffmpeg = require('fluent-ffmpeg')
 const stream = require('stream')
 const { promisify } = require('util')
 const { createWriteStream } = require('fs')
+const { v4 } = require('uuid')
 
 exports.isTiktokLink = (link) => {
   return link.includes('https://' && 'tiktok.com')
@@ -24,18 +25,30 @@ exports.downloadTiktokVideo = async (link) => {
     //cookie: `tt_webid_v2=689854141086886123`,
     cookie: `tt_webid_v2=${cookieID}`,
   }
-  const response = await TikTokScraper.getVideoMeta(link, headers)
-  if (!response || !response.collector || !response.collector[0])
-    throw new Error('ERROR: Could not download')
-  const data = response.collector[0]
-  const author = data.authorMeta.name
-  const title = data.text
-  const slug = slugify(title, {
-    strict: true,
-    lower: true,
-    trim: true,
-  }).substring(0, 50)
-  const id = data.id
+  let meta = false
+  let data, author, title, slug, id
+  try {
+    const response = await TikTokScraper.getVideoMeta(link, headers)
+    if (!response || !response.collector || !response.collector[0])
+      throw new Error('ERROR: Could not download')
+    data = response.collector[0]
+    author = data.authorMeta.name
+    title = data.text
+    slug = slugify(title, {
+      strict: true,
+      lower: true,
+      trim: true,
+    }).substring(0, 50)
+    id = data.id
+    meta = true
+  } catch (err) {
+    console.error(error)
+    try {
+      id = link.split('/video/')[1].split('?')[0]
+    } catch (err) {
+      id = v4()
+    }
+  }
   const filename = id + '.mp4'
   const filepath = process.env.VIDEO_PATH + '/' + filename
   const videoOptions = {
@@ -57,7 +70,7 @@ exports.downloadTiktokVideo = async (link) => {
   const videoStuff = await TikTokScraper.video(link, videoOptions)
   if (!videoStuff || !videoStuff.message)
     throw new Error('ERROR: Could not download the video')
-  return { data, id, author, title, slug, filename, filepath }
+  return { meta, data, id, author, title, slug, filename, filepath }
 }
 
 exports.downloadFile = async (fileUrl, outputLocationPath) => {

@@ -18,7 +18,8 @@
     "js-file-download": "^0.4.12",
     "mongoose": "^5.13.5",
     "slugify": "^1.6.0",
-    "tiktok-scraper": "^1.4.33"
+    "tiktok-scraper": "^1.4.33",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.12"

@@ -56,42 +56,45 @@ client.on('message', async (message) => {
       await message.react('⬇️')
       // download video
       const response = await downloadTiktokVideo(link)
-      await message.reactions.removeAll()
       if (response) {
-        await message.react('💱')
         try {
-          console.log(`writing ${response.id} to db...`)
-          try {
-            await TikTok.create({
-              author: response.author,
-              title: response.title,
-              slug: response.slug,
-              filename: response.filename,
-              filepath: response.filepath,
-              vid_id: response.id,
-              data: response.data,
-              link,
-              requester: message.author.tag,
-            })
-            console.log(`written.`)
-          } catch (err) {
-            console.error(`error writing to db: ${err}`)
+          if (response.meta) {
+            console.log(`writing ${response.id} to db...`)
+            try {
+              await TikTok.create({
+                author: response.author,
+                title: response.title,
+                slug: response.slug,
+                filename: response.filename,
+                filepath: response.filepath,
+                vid_id: response.id,
+                data: response.data,
+                link,
+                requester: message.author.tag,
+              })
+              console.log(`written.`)
+            } catch (err) {
+              console.error(`error writing to db: ${err}`)
+            }
           }
+          await message.reactions.removeAll()
+          await message.react('💱')
           const smallerPath =
             process.env.VIDEO_SMALLER_PATH + '/smaller-' + response.filename
           await makeVideoSmaller(response.filepath, smallerPath, 8000000)
           console.log(`uploading ${smallerPath}...`)
           await message.reactions.removeAll()
           await message.react('⬆️')
-          await message.inlineReply(
+          let msg =
             '```▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬­­­­­­­­­­­­­­­­▬▬▬\n' +
-              '🍹👍 ANOTHER SUCCESSFUL SLURP 👍🍹\n' +
-              '▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬­­­­­­­­­­­­­­­­▬▬▬\n' +
-              `Author: ${response.author}\nTitle: ${response.title}\n\`\`\``,
-            {
-              files: [smallerPath],
-            }
-          )
+            '🍹👍 ANOTHER SUCCESSFUL SLURP 👍🍹\n' +
+            '▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬­­­­­­­­­­­­­­­­▬▬▬\n'
+          if (response.meta) {
+            msg += `Author: ${response.author}\nTitle: ${response.title}\n\`\`\``
+          }
+          await message.inlineReply(msg, {
+            files: [smallerPath],
+          })
           console.log(`sent ${smallerPath}`)
           await message.reactions.removeAll()
           await message.react('💾')
