@@ -27,6 +27,12 @@ const tiktokSchema = mongoose.Schema({
   slug: {
     type: String,
   },
+  link: {
+    type: String,
+  },
+  requester: {
+    type: String,
+  },
 })
 
 module.exports = mongoose.model('tiktok', tiktokSchema)

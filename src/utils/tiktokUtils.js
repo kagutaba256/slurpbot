@@ -5,7 +5,6 @@ const ffmpeg = require('fluent-ffmpeg')
 const stream = require('stream')
 const { promisify } = require('util')
 const { createWriteStream } = require('fs')
-const TikTok = require('../models/tiktokModel')
 
 exports.isTiktokLink = (link) => {
   return link.includes('https://' && 'vm.tiktok.com')
@@ -56,21 +55,6 @@ exports.downloadTiktokVideo = async (link) => {
   const videoStuff = await TikTokScraper.video(link, videoOptions)
   if (!videoStuff || !videoStuff.message)
     throw new Error('ERROR: Could not download the video')
-  console.log(`writing ${slug} to db...`)
-  try {
-    await TikTok.create({
-      author,
-      title,
-      slug,
-      filename,
-      filepath,
-      vid_id: id,
-      data,
-    })
-    console.log(`written.`)
-  } catch (err) {
-    console.error(`error writing to db: ${err}`)
-  }
   return { data, id, author, title, slug, filename, filepath }
 }
 

@@ -5,6 +5,7 @@ require('./utils/ExtendedMessage')
 const axios = require('axios')
 const fileDownload = require('js-file-download')
 const { connectDB } = require('./utils/db')
+const TikTok = require('./models/tiktokModel')
 
 connectDB()
 
@@ -59,6 +60,23 @@ client.on('message', async (message) => {
       if (response) {
         await message.react('💱')
         try {
+          console.log(`writing ${response.id} to db...`)
+          try {
+            await TikTok.create({
+              author: response.author,
+              title: response.title,
+              slug: response.slug,
+              filename: response.filename,
+              filepath: response.filepath,
+              vid_id: response.id,
+              data: response.data,
+              link,
+              requester: message.author.tag,
+            })
+            console.log(`written.`)
+          } catch (err) {
+            console.error(`error writing to db: ${err}`)
+          }
           const smallerPath =
             process.env.VIDEO_SMALLER_PATH + '/smaller-' + response.filename
           await makeVideoSmaller(response.filepath, smallerPath, 8000000)
