@@ -1,5 +1,7 @@
 exports.isMusicLink = (link) => {
   const valid = [
+    'http',
+    'https',
     'youtube.com',
     'youtu.be',
     'soundcloud.com',
