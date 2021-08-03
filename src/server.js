@@ -83,6 +83,8 @@ client.on('message', async (message) => {
                 vid_id: response.id,
                 link,
                 requester: message.author.tag,
+                filename: response.filename,
+                filepath: response.filepath,
               })
               console.log(`written.`)
             } catch (err) {
