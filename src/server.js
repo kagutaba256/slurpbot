@@ -104,16 +104,24 @@ client.on('message', async (message) => {
             msg += `Author: ${response.author}\nTitle: ${response.title}\n`
           }
           msg += '```'
-          await message.inlineReply(msg, {
-            files: [smallerPath],
-          })
-          console.log(`sent ${smallerPath}`)
-          await message.reactions.removeAll()
-          await message.react('💾')
+          try {
+            await message.inlineReply(msg, {
+              files: [smallerPath],
+            })
+            console.log(`sent ${smallerPath}`)
+            await message.reactions.removeAll()
+            await message.react('💾')
+          } catch (err) {
+            console.error(err)
+            await message.reactions.removeAll()
+            await message.react('❌')
+            await message.react('⬆')
+          }
         } catch (err) {
           console.error(err)
           await message.reactions.removeAll()
-          await message.react('💾❌')
+          await message.react('❌')
+          await message.react('💾')
         }
       } else {
         await message.react('❌')

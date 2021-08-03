@@ -94,7 +94,7 @@ exports.makeVideoSmaller = async (input, output, sizeTarget) => {
         .input(input)
         .inputFormat('mp4')
         .outputOptions('-vcodec', 'libx264')
-        .outputOptions('-preset', 'slower')
+        //.outputOptions('-preset', 'slower')
         .outputOptions('-crf', '32')
         .on('progress', (progress) =>
           console.log('converting: ' + progress.timemark)
