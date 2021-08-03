@@ -1,0 +1,11 @@
+{
+  "name": "slurpbot",
+  "version": "1.0.0",
+  "description": "for slurping videos with discord.js",
+  "main": "server.js",
+  "author": "sam little",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^12.5.3"
+  }
+}
