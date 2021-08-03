@@ -42,7 +42,7 @@ exports.downloadTiktokVideo = async (link) => {
     id = data.id
     meta = true
   } catch (err) {
-    console.error(error)
+    console.error(err)
     try {
       id = link.split('/video/')[1].split('?')[0]
     } catch (err) {
