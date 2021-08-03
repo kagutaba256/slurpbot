@@ -4,6 +4,10 @@ const discord = require('discord.js')
 require('./utils/ExtendedMessage')
 const axios = require('axios')
 const fileDownload = require('js-file-download')
+const { connectDB } = require('./utils/db')
+
+connectDB()
+
 const {
   isTiktokLink,
   downloadTiktokVideo,
