@@ -7,6 +7,7 @@ const fileDownload = require('js-file-download')
 const { connectDB } = require('./utils/db')
 const TikTok = require('./models/tiktokModel')
 const Music = require('./models/musicModel')
+const Pic = require('./models/picModel')
 const {
   isTiktokLink,
   downloadTiktokVideo,
@@ -154,6 +155,32 @@ client.on('message', async (message) => {
     console.log(`saved ${link}`)
     await message.react('💾')
   } else if (message.channel.id === process.env.PICS_CHANNEL_ID) {
+    if (message.attachments.size > 0) {
+      try {
+        for (attachment in message.attachments.array()) {
+          let a = message.attachments.array()[attachment]
+          console.log(`downloading ${a.name}`)
+          await message.reactions.removeAll()
+          await message.react('⬇️')
+          const filepath = process.env.PIC_PATH + '/' + a.name
+          downloadFile(a.url, filepath)
+          console.log(`done downloading ${a.name}.`)
+          console.log(`sending ${a.name} to db...`)
+          await Pic.create({
+            sender: message.author.tag,
+            filepath,
+          })
+          console.log(`sent`)
+        }
+        await message.reactions.removeAll()
+        await message.react('💾')
+      } catch (err) {
+        console.error(err)
+        await message.reactions.removeAll()
+        await message.react('❗')
+        await message.react('💾')
+      }
+    }
   }
 })
 
