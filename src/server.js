@@ -58,38 +58,34 @@ client.on('message', async (message) => {
       const response = await downloadTiktokVideo(link)
       if (response) {
         try {
+          let options = {}
           if (response.meta) {
-            console.log(`writing ${response.id} to db...`)
-            try {
-              await TikTok.create({
-                author: response.author,
-                title: response.title,
-                slug: response.slug,
-                filename: response.filename,
-                filepath: response.filepath,
-                vid_id: response.id,
-                data: response.data,
-                link,
-                requester: message.author.tag,
-              })
-              console.log(`written.`)
-            } catch (err) {
-              console.error(`error writing to db: ${err}`)
+            options = {
+              author: response.author,
+              title: response.title,
+              slug: response.slug,
+              filename: response.filename,
+              filepath: response.filepath,
+              vid_id: response.id,
+              data: response.data,
+              link,
+              requester: message.author.tag,
             }
           } else {
-            console.log(`writing ${response.id} to db...`)
-            try {
-              await TikTok.create({
-                vid_id: response.id,
-                link,
-                requester: message.author.tag,
-                filename: response.filename,
-                filepath: response.filepath,
-              })
-              console.log(`written.`)
-            } catch (err) {
-              console.error(`error writing to db: ${err}`)
+            options = {
+              vid_id: response.id,
+              link,
+              requester: message.author.tag,
+              filename: response.filename,
+              filepath: response.filepath,
             }
+          }
+          try {
+            console.log(`writing ${response.id} to db...`)
+            await TikTok.create(options)
+            console.log(`written.`)
+          } catch (err) {
+            console.error(`error writing to db: ${err}`)
           }
           await message.reactions.removeAll()
           await message.react('💱')
