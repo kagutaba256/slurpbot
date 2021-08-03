@@ -5,7 +5,22 @@
   "main": "server.js",
   "author": "sam little",
   "license": "MIT",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
   "dependencies": {
-    "discord.js": "^12.5.3"
+    "axios": "^0.21.1",
+    "colors": "^1.4.0",
+    "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "js-file-download": "^0.4.12",
+    "mongoose": "^5.13.5",
+    "slugify": "^1.6.0",
+    "tiktok-scraper": "^1.4.33"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
   }
 }

@@ -1,9 +1,7 @@
 const TikTokScraper = require('tiktok-scraper')
-const fileDownloader = require('js-file-download')
 const axios = require('axios')
 const slugify = require('slugify')
-const { default: fileDownload } = require('js-file-download')
-const { get } = require('mongoose')
+const ffmpeg = require('fluent-ffmpeg')
 
 exports.isTiktokLink = (link) => {
   return link.includes('https://' && 'tiktok.com')
@@ -29,7 +27,8 @@ exports.downloadTiktokVideo = async (link) => {
   const title = data.text
   const slug = slugify(title)
   const id = data.id
-  const filename = process.env.VIDEO_PATH + '/' + id + '.mp4'
+  const filename = id + '.mp4'
+  const filepath = process.env.VIDEO_PATH + '/' + filename
   const videoOptions = {
     _: ['video'],
     d: true,
@@ -50,7 +49,82 @@ exports.downloadTiktokVideo = async (link) => {
   if (!videoStuff || !videoStuff.message)
     throw new Error('ERROR: Could not download the video')
   console.log(videoStuff)
-  return { data, id, author, title, slug, filename }
+  return { data, id, author, title, slug, filename, filepath }
 }
 
-exports.makeVideoSmaller = async (file, sizeTarget) => {}
+exports.makeVideoSmaller = async (input, output, sizeTarget) => {
+  function ffConvert() {
+    return new Promise((resolve, reject) => {
+      console.log('doing things')
+      ffmpeg()
+        .input(input)
+        .inputFormat('mp4')
+        .outputOptions('-fs', sizeTarget - 2000000)
+        .on('progress', (progress) =>
+          console.log('converting: ' + progress.timemark)
+        )
+        .save(output)
+        .on('end', async (stdout, stderr) => {
+          console.log(stdout)
+          console.error(stderr)
+          console.log(`done converting ${output}`)
+          await ffmpeg.ffprobe(output, (err, metadata) => {
+            if (metadata.format.size >= sizeTarget) {
+              console.log(`failed to make ${output} smaller than ${sizeTarget}`)
+            }
+            resolve()
+          })
+        })
+        .on('err', (err) => {
+          reject(err)
+        })
+    })
+  }
+  await ffConvert()
+}
+//   await ffmpeg.ffprobe(input, async (err, metadata) => {
+//     console.log('doing things 1234')
+//     console.log('doing things 132')
+//     if (metadata.format.size < sizeTarget) {
+//       console.log('already smaller.')
+//       retval = input
+//       return input
+//     } else {
+//       console.log('doing things 1')
+//       await ffmpeg.ffprobe(input, async (err, metadata) => {
+//         function ffConvert() {
+//           return new Promise((resolve, reject) => {
+//             console.log('doing things')
+//             ffmpeg()
+//               .input(input)
+//               .inputFormat('mp4')
+//               .outputOptions('-fs', sizeTarget - 2000000)
+//               .on('progress', (progress) =>
+//                 console.log('converting: ' + progress.timemark)
+//               )
+//               .save(output)
+//               .on('end', async (stdout, stderr) => {
+//                 console.log(stdout)
+//                 console.error(stderr)
+//                 console.log(`done converting ${output}`)
+//                 await ffmpeg.ffprobe(output, (err, metadata) => {
+//                   if (metadata.format.size >= sizeTarget) {
+//                     console.log(
+//                       `failed to make ${output} smaller than ${sizeTarget}`
+//                     )
+//                   }
+//                   return output
+//                 })
+//                 callback()
+//               })
+//               .on('err', (err) => {
+//                 reject(err)
+//               })
+//               .run()
+//           })
+//         }
+//         Promise.resolve(ffConvert())
+//       })
+//     }
+//   })
+// }
