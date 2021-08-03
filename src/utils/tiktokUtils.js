@@ -84,12 +84,12 @@ exports.makeVideoSmaller = async (input, output, sizeTarget) => {
           console.log(stdout)
           console.error(stderr)
           console.log(`done converting ${output}`)
-          await ffmpeg.ffprobe(output, (err, metadata) => {
-            if (metadata.format.size >= sizeTarget) {
-              console.log(`failed to make ${output} smaller than ${sizeTarget}`)
-            }
-            resolve()
-          })
+          // await ffmpeg.ffprobe(output, (err, metadata) => {
+          //   if (metadata.format.size >= sizeTarget) {
+          //     console.log(`failed to make ${output} smaller than ${sizeTarget}`)
+          //   }
+          resolve()
+          // })
         })
         .on('err', (err) => {
           reject(err)
