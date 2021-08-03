@@ -76,6 +76,18 @@ client.on('message', async (message) => {
             } catch (err) {
               console.error(`error writing to db: ${err}`)
             }
+          } else {
+            console.log(`writing ${response.id} to db...`)
+            try {
+              await TikTok.create({
+                vid_id: response.id,
+                link,
+                requester: message.author.tag,
+              })
+              console.log(`written.`)
+            } catch (err) {
+              console.error(`error writing to db: ${err}`)
+            }
           }
           await message.reactions.removeAll()
           await message.react('💱')
@@ -90,8 +102,9 @@ client.on('message', async (message) => {
             '🍹👍 ANOTHER SUCCESSFUL SLURP 👍🍹\n' +
             '▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬­­­­­­­­­­­­­­­­▬▬▬\n'
           if (response.meta) {
-            msg += `Author: ${response.author}\nTitle: ${response.title}\n\`\`\``
+            msg += `Author: ${response.author}\nTitle: ${response.title}\n`
           }
+          msg += '```'
           await message.inlineReply(msg, {
             files: [smallerPath],
           })
