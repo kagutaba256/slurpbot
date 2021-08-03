@@ -2,6 +2,9 @@ const TikTokScraper = require('tiktok-scraper')
 const axios = require('axios')
 const slugify = require('slugify')
 const ffmpeg = require('fluent-ffmpeg')
+const stream = require('stream')
+const { promisify } = require('util')
+const { createWriteStream } = require('fs')
 
 exports.isTiktokLink = (link) => {
   return link.includes('https://' && 'tiktok.com')
@@ -50,6 +53,19 @@ exports.downloadTiktokVideo = async (link) => {
     throw new Error('ERROR: Could not download the video')
   console.log(videoStuff)
   return { data, id, author, title, slug, filename, filepath }
+}
+
+exports.downloadFile = async (fileUrl, outputLocationPath) => {
+  const finished = promisify(stream.finished)
+  const writer = createWriteStream(outputLocationPath)
+  return axios({
+    method: 'get',
+    url: fileUrl,
+    responseType: 'stream',
+  }).then(async (response) => {
+    response.data.pipe(writer)
+    return finished(writer) //this is a Promise
+  })
 }
 
 exports.makeVideoSmaller = async (input, output, sizeTarget) => {
