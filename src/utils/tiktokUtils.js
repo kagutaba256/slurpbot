@@ -7,11 +7,13 @@ const { promisify } = require('util')
 const { createWriteStream } = require('fs')
 
 exports.isTiktokLink = (link) => {
-  return link.includes('https://' && 'vm.tiktok.com')
+  return link.includes('https://' && 'tiktok.com')
 }
 
 exports.downloadTiktokVideo = async (link) => {
-  const getCookieRes = await axios.get(link, { withCredentials: true })
+  const getCookieRes = await axios.get(process.env.TEST_LINK, {
+    withCredentials: true,
+  })
   const cookieID = getCookieRes.headers['set-cookie'][0]
     .split(';')[0]
     .split('=')[1]
