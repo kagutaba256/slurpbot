@@ -55,6 +55,7 @@ client.on('message', async (message) => {
       console.log(`[PROCESSING]: ${link}`)
       await message.react('⬇️')
       // download video
+      console.log(`downloading ${link}...`)
       const response = await downloadTiktokVideo(link)
       if (response) {
         try {

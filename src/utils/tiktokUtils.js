@@ -93,14 +93,16 @@ exports.makeVideoSmaller = async (input, output, sizeTarget) => {
       ffmpeg()
         .input(input)
         .inputFormat('mp4')
-        .outputOptions('-fs', sizeTarget - 2000000)
+        .outputOptions('-vcodec', 'libx264')
+        .outputOptions('-preset', 'slower')
+        .outputOptions('-crf', '32')
         .on('progress', (progress) =>
           console.log('converting: ' + progress.timemark)
         )
         .save(output)
         .on('end', async (stdout, stderr) => {
-          console.log(stdout)
-          console.error(stderr)
+          //console.log(stdout)
+          //console.error(stderr)
           console.log(`done converting ${output}`)
           // await ffmpeg.ffprobe(output, (err, metadata) => {
           //   if (metadata.format.size >= sizeTarget) {
