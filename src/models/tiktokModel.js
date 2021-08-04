@@ -19,7 +19,7 @@ const tiktokSchema = mongoose.Schema({
     type: Object,
   },
   vid_id: {
-    type: Number,
+    type: String,
   },
   author: {
     type: String,

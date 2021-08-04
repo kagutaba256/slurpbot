@@ -3,6 +3,7 @@ require('colors')
 const discord = require('discord.js')
 require('./utils/ExtendedMessage')
 const axios = require('axios')
+const { v4 } = require('uuid')
 const fileDownload = require('js-file-download')
 const { connectDB } = require('./utils/db')
 const TikTok = require('./models/tiktokModel')
@@ -33,11 +34,22 @@ client.on('message', async (message) => {
       const a = message.attachments.array()[0]
       if (a.url.indexOf('mp4', a.url.length - 'mp4'.length) !== -1) {
         try {
-          console.log(`downloading ${a.name}`)
+          const randomGuid = v4()
+          const randomFileName = randomGuid + '.mp4'
+          const filepath = process.env.VIDEO_PATH + '/' + randomFileName
+          console.log(`downloading ${a.name} as ${randomFileName}`)
           await message.reactions.removeAll()
           await message.react('⬇️')
-          downloadFile(a.url, process.env.VIDEO_PATH + '/' + a.name)
-          console.log(`done downloading ${a.name}.`)
+          downloadFile(a.url, filepath)
+          console.log(`done downloading ${randomFileName}.`)
+          options = {
+            vid_id: randomGuid,
+            requester: message.author.tag,
+            filename: randomFileName,
+            filepath,
+          }
+          await TikTok.create(options)
+          console.log(`sent ${randomGuid} to db`)
           await message.reactions.removeAll()
           await message.react('💾')
         } catch (err) {
