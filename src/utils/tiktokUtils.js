@@ -58,6 +58,7 @@ exports.downloadTiktokVideo = async (link) => {
     asyncDownload: 5,
     a: 5,
     "async-download": 5,
+    timeout: 30 * 1000,
     filepath: process.env.VIDEO_PATH,
     headers: {
       "user-agent":
