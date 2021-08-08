@@ -22,6 +22,7 @@ exports.downloadTiktokVideo = async (link) => {
     "user-agent":
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36",
     referer: "https://www.tiktok.com/",
+    timeout: 30 * 1000,
     //cookie: `tt_webid_v2=689854141086886123`,
     cookie: `tt_webid_v2=${cookieID}`,
   };
@@ -80,7 +81,7 @@ exports.downloadFile = async (fileUrl, outputLocationPath) => {
   return axios({
     method: "get",
     url: fileUrl,
-    timeout: 20 * 1000,
+    timeout: 30 * 1000,
     responseType: "stream",
     headers: {
       "user-agent":
