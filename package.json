@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "download-songs": "node utils/song-downloader.js"
   },
   "dependencies": {
     "axios": "^0.21.1",
@@ -16,10 +17,12 @@
     "dotenv": "^10.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "js-file-download": "^0.4.12",
+    "mkdirp": "^1.0.4",
     "mongoose": "^5.13.5",
     "slugify": "^1.6.0",
     "tiktok-scraper": "^1.4.33",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "youtube-dl-exec": "^1.2.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.12"
