@@ -12,31 +12,31 @@ const downloadAllSongs = async () => {
   const music = Music()
   const files = await music.find()
   const root = process.env.MUSIC_PATH
-  await Promise.all(
-    files.map(async (song) => {
-      const requester = slugify(song.requester)
-      const folder = `${root}/${requester}`
-      await mkdirp(folder)
-      await ydl(
-        song.link,
-        {
-          extractAudio: true,
-          audioFormat: 'mp3',
-          q: true,
-        },
-        {
-          cwd: folder,
-        }
-      )
-        .then(() => {
-          count++
-          console.log(`slurped ${song.link}`.green)
-        })
-        .catch((err) => {
-          console.log(`couldnt get ${song.link}`.red)
-        })
-    })
-  )
+  for (let i = 0; i < files.length; i++) {
+    const song = files[i]
+    console.log(`downloading ${song.link}...`.yellow)
+    const requester = slugify(song.requester)
+    const folder = `${root}/${requester}`
+    await mkdirp(folder)
+    await ydl(
+      song.link,
+      {
+        extractAudio: true,
+        audioFormat: 'mp3',
+        q: true,
+      },
+      {
+        cwd: folder,
+      }
+    )
+      .then(() => {
+        count++
+        console.log(`slurped ${song.link}`.green)
+      })
+      .catch((err) => {
+        console.log(`couldnt get ${song.link}`.red)
+      })
+  }
   console.log(`Downloaded ${count} songs.`.green.inverse)
 }
 
