@@ -4,7 +4,6 @@ const mongoose = require('mongoose')
 const ydl = require('youtube-dl-exec')
 const slugify = require('slugify')
 const mkdirp = require('mkdirp')
-const fs = require('fs')
 
 const downloadAllSongs = async () => {
   await connectDB()

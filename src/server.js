@@ -74,27 +74,12 @@ client.on('message', async (message) => {
         const response = await downloadTiktokVideo(link)
         if (response) {
           try {
-            let options = {}
-            if (response.meta) {
-              options = {
-                author: response.author,
-                title: response.title,
-                slug: response.slug,
-                filename: response.filename,
-                filepath: response.filepath,
-                vid_id: response.id,
-                data: response.data,
-                link,
-                requester: message.author.tag,
-              }
-            } else {
-              options = {
-                vid_id: response.id,
-                link,
-                requester: message.author.tag,
-                filename: response.filename,
-                filepath: response.filepath,
-              }
+            const options = {
+              vid_id: response.id,
+              link,
+              requester: message.author.tag,
+              filename: response.filename,
+              filepath: response.filepath,
             }
             try {
               console.log(`writing ${response.id} to db...`)
@@ -117,14 +102,15 @@ client.on('message', async (message) => {
             console.log(`uploading ${smallerPath}...`)
             await message.reactions.removeAll()
             await message.react('⬆️')
-            let msg =
-              '```▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬­­­­­­­­­­­­­­­­▬▬▬\n' +
-              '🍹👍 ANOTHER SUCCESSFUL SLURP 👍🍹\n' +
-              '▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬­­­­­­­­­­­­­­­­▬▬▬\n'
-            if (response.meta) {
-              msg += `Author: ${response.author}\nTitle: ${response.title}\n`
-            }
-            msg += '```'
+            let msg = ''
+            // let msg =
+            //   "```▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬­­­­­­­­­­­­­­­­▬▬▬\n" +
+            //   "🍹👍 ANOTHER SUCCESSFUL SLURP 👍🍹\n" +
+            //   "▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬­­­­­­­­­­­­­­­­▬▬▬\n";
+            // if (response.meta) {
+            //   msg += `Author: ${response.author}\nTitle: ${response.title}\n`;
+            // }
+            // msg += "```";
             try {
               await message.inlineReply(msg, {
                 files: [smallerPath],
