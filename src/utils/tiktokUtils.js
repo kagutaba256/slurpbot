@@ -12,7 +12,7 @@ exports.isTiktokLink = (link) => {
   return (
     link.includes('http') &&
     link.includes('://') &&
-    ((link.includes('twitch') && link.includes('/clip/')) ||
+    ((link.includes('twitch') && link.includes('clip')) ||
       link.includes('tiktok') ||
       link.includes('reddit'))
   )
