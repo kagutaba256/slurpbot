@@ -14,6 +14,8 @@ exports.isTiktokLink = (link) => {
     link.includes('://') &&
     ((link.includes('twitch') && link.includes('clip')) ||
       link.includes('tiktok') ||
+      link.includes('twitter') ||
+      link.includes('facebook') ||
       link.includes('reddit'))
   )
 }
