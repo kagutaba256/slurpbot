@@ -1,6 +1,4 @@
-const TikTokScraper = require('tiktok-scraper')
 const axios = require('axios')
-const slugify = require('slugify')
 const ffmpeg = require('fluent-ffmpeg')
 const stream = require('stream')
 const { promisify } = require('util')
@@ -71,15 +69,8 @@ exports.makeVideoSmaller = async (input, output, sizeTarget) => {
           )
           .save(output)
           .on('end', async (stdout, stderr) => {
-            //console.log(stdout)
-            //console.error(stderr)
             console.log(`done converting ${output}`)
-            // await ffmpeg.ffprobe(output, (err, metadata) => {
-            //   if (metadata.format.size >= sizeTarget) {
-            //     console.log(`failed to make ${output} smaller than ${sizeTarget}`)
-            //   }
             resolve()
-            // })
           })
           .on('err', (err) => {
             reject(err)
@@ -91,49 +82,3 @@ exports.makeVideoSmaller = async (input, output, sizeTarget) => {
   }
   await ffConvert()
 }
-//   await ffmpeg.ffprobe(input, async (err, metadata) => {
-//     console.log('doing things 1234')
-//     console.log('doing things 132')
-//     if (metadata.format.size < sizeTarget) {
-//       console.log('already smaller.')
-//       retval = input
-//       return input
-//     } else {
-//       console.log('doing things 1')
-//       await ffmpeg.ffprobe(input, async (err, metadata) => {
-//         function ffConvert() {
-//           return new Promise((resolve, reject) => {
-//             console.log('doing things')
-//             ffmpeg()
-//               .input(input)
-//               .inputFormat('mp4')
-//               .outputOptions('-fs', sizeTarget - 2000000)
-//               .on('progress', (progress) =>
-//                 console.log('converting: ' + progress.timemark)
-//               )
-//               .save(output)
-//               .on('end', async (stdout, stderr) => {
-//                 console.log(stdout)
-//                 console.error(stderr)
-//                 console.log(`done converting ${output}`)
-//                 await ffmpeg.ffprobe(output, (err, metadata) => {
-//                   if (metadata.format.size >= sizeTarget) {
-//                     console.log(
-//                       `failed to make ${output} smaller than ${sizeTarget}`
-//                     )
-//                   }
-//                   return output
-//                 })
-//                 callback()
-//               })
-//               .on('err', (err) => {
-//                 reject(err)
-//               })
-//               .run()
-//           })
-//         }
-//         Promise.resolve(ffConvert())
-//       })
-//     }
-//   })
-// }

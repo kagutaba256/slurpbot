@@ -2,9 +2,8 @@ require('dotenv').config({ path: './config/config.env' })
 require('colors')
 const discord = require('discord.js')
 require('./utils/ExtendedMessage')
-const axios = require('axios')
 const { v4 } = require('uuid')
-const fileDownload = require('js-file-download')
+const { reactToMessage } = require('./utils/messageUtils')
 const { connectDB } = require('./utils/db')
 const TikTok = require('./models/tiktokModel')
 const Music = require('./models/musicModel')
@@ -38,8 +37,7 @@ client.on('message', async (message) => {
           const randomFileName = randomGuid + '.mp4'
           const filepath = process.env.VIDEO_PATH + '/' + randomFileName
           console.log(`downloading ${a.name} as ${randomFileName}`)
-          await message.reactions.removeAll()
-          await message.react('⬇️')
+          await reactToMessage(message, '⬇️')
           downloadFile(a.url, filepath)
           console.log(`done downloading ${randomFileName}.`)
           options = {
@@ -50,12 +48,10 @@ client.on('message', async (message) => {
           }
           await TikTok.create(options)
           console.log(`sent ${randomGuid} to db`)
-          await message.reactions.removeAll()
-          await message.react('💾')
+          await reactToMessage(message, '💾')
         } catch (err) {
           console.error(err)
-          await message.reactions.removeAll()
-          await message.react('❗')
+          await reactToMessage(message, '❗')
         }
       }
       return
@@ -68,7 +64,7 @@ client.on('message', async (message) => {
     if (isTiktokLink(link)) {
       try {
         console.log(`[PROCESSING]: ${link}`)
-        await message.react('⬇️')
+        await reactToMessage(message, '⬇️')
         // download video
         console.log(`downloading ${link}...`)
         const response = await downloadTiktokVideo(link)
@@ -88,55 +84,40 @@ client.on('message', async (message) => {
             } catch (err) {
               console.error(`error writing to db: ${err}`)
             }
-            await message.reactions.removeAll()
-            await message.react('💱')
+            await reactToMessage(message, '💱')
             const smallerPath =
               process.env.VIDEO_SMALLER_PATH + '/smaller-' + response.filename
             try {
               await makeVideoSmaller(response.filepath, smallerPath, 8000000)
             } catch {
-              await message.reactions.removeAll()
-              await message.react('💣')
+              await reactToMessage(message, '💣')
               return
             }
             console.log(`uploading ${smallerPath}...`)
-            await message.reactions.removeAll()
-            await message.react('⬆️')
+            await reactToMessage(message, '⬆️')
             let msg = ''
-            // let msg =
-            //   "```▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬­­­­­­­­­­­­­­­­▬▬▬\n" +
-            //   "🍹👍 ANOTHER SUCCESSFUL SLURP 👍🍹\n" +
-            //   "▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬­­­­­­­­­­­­­­­­▬▬▬\n";
-            // if (response.meta) {
-            //   msg += `Author: ${response.author}\nTitle: ${response.title}\n`;
-            // }
-            // msg += "```";
             try {
               await message.inlineReply(msg, {
                 files: [smallerPath],
               })
               console.log(`sent ${smallerPath}`)
-              await message.reactions.removeAll()
-              await message.react('💾')
+              await reactToMessage(message, '💾')
             } catch (err) {
               console.error(err)
-              await message.reactions.removeAll()
-              await message.react('❌')
+              await reactToMessage(message, '❌')
               await message.react('⬆')
             }
           } catch (err) {
             console.error(err)
-            await message.reactions.removeAll()
-            await message.react('❌')
+            await reactToMessage(message, '❌')
             await message.react('💾')
           }
         } else {
-          await message.react('❌')
+          await reactToMessage(message, '❌')
         }
       } catch (err) {
         console.error(err)
-        await message.reactions.removeAll()
-        await message.react('❗')
+        await reactToMessage(message, '❗')
       }
     }
   } else if (message.channel.id === process.env.MUSIC_CHANNEL_ID) {
@@ -158,8 +139,7 @@ client.on('message', async (message) => {
         for (attachment in message.attachments.array()) {
           let a = message.attachments.array()[attachment]
           console.log(`downloading ${a.name}`)
-          await message.reactions.removeAll()
-          await message.react('⬇️')
+          await reactToMessage(message, '⬇️')
           const filepath = process.env.PIC_PATH + '/' + a.name
           downloadFile(a.url, filepath)
           console.log(`done downloading ${a.name}.`)
@@ -170,12 +150,10 @@ client.on('message', async (message) => {
           })
           console.log(`sent`)
         }
-        await message.reactions.removeAll()
-        await message.react('💾')
+        await reactToMessage(message, '💾')
       } catch (err) {
         console.error(err)
-        await message.reactions.removeAll()
-        await message.react('❗')
+        await reactToMessage(message, '❗')
         await message.react('💾')
       }
     }
