@@ -15,7 +15,7 @@ const {
   makeVideoSmaller,
   downloadFile,
 } = require('./utils/videoUtils')
-const { isMusicLink } = require('./utils/musicUtils')
+const { isMusicLink, downloadMusicWithYdl } = require('./utils/musicUtils')
 
 connectDB()
 
@@ -113,12 +113,17 @@ client.on('message', async (message) => {
     })
     if (link === null) return
     console.log(`saving music ${link}...`)
+    await reactToMessage(message, '⬇️')
+    const { id, filename, filepath } = await downloadMusicWithYdl(link)
     await Music.create({
+      guid: id,
       link,
+      filename,
+      filepath,
       requester: message.author.tag,
     })
     console.log(`saved ${link}`)
-    await message.react('💾')
+    await reactToMessage(message, '💾')
   } else if (message.channel.id === process.env.PICS_CHANNEL_ID) {
     if (message.attachments.size > 0) {
       try {

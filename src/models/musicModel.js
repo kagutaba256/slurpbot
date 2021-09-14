@@ -11,6 +11,18 @@ const musicSchema = mongoose.Schema({
   requester: {
     type: String,
   },
+  filename: {
+    type: String,
+    required: true,
+  },
+  filepath: {
+    type: String,
+    required: true,
+  },
+  guid: {
+    type: String,
+    required: true,
+  },
 })
 
 module.exports = mongoose.model('music', musicSchema)
