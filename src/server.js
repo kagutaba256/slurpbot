@@ -84,7 +84,7 @@ client.on('message', async (message) => {
             } catch (err) {
               console.error(`error writing to db: ${err}`)
             }
-            await reactToMessage(message, '💱')
+            await reactToMessage(message, '🔄')
             const smallerPath =
               process.env.VIDEO_SMALLER_PATH + '/smaller-' + response.filename
             try {
