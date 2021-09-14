@@ -6,19 +6,25 @@ const { createWriteStream } = require('fs')
 const { v4 } = require('uuid')
 const ydl = require('youtube-dl-exec')
 
-exports.isTiktokLink = (link) => {
+exports.isSlurpable = (link) => {
   return (
-    link.includes('http') &&
-    link.includes('://') &&
-    ((link.includes('twitch') && link.includes('clip')) ||
-      link.includes('tiktok') ||
-      link.includes('twitter') ||
-      link.includes('facebook') ||
-      link.includes('reddit'))
+    (link.includes('http') &&
+      link.includes('://') &&
+      ((link.includes('twitch') && link.includes('clip')) ||
+        link.includes('tiktok') ||
+        link.includes('twitter') ||
+        link.includes('facebook') ||
+        link.includes('reddit'))) ||
+    link.includes('youtube.com/watch') ||
+    link.includes('youtu.be')
   )
 }
 
-exports.downloadTiktokVideo = async (link) => {
+exports.isNonPostable = (link) => {
+  return link.includes('youtube.com/watch') || link.includes('youtu.be')
+}
+
+exports.downloadVideoWithYdl = async (link) => {
   const id = v4()
   const filename = id + '.mp4'
   const path = process.env.VIDEO_PATH

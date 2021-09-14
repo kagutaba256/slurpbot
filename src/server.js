@@ -9,11 +9,12 @@ const TikTok = require('./models/tiktokModel')
 const Music = require('./models/musicModel')
 const Pic = require('./models/picModel')
 const {
-  isTiktokLink,
-  downloadTiktokVideo,
+  isSlurpable,
+  isNonPostable,
+  downloadVideoWithYdl,
   makeVideoSmaller,
   downloadFile,
-} = require('./utils/tiktokUtils')
+} = require('./utils/videoUtils')
 const { isMusicLink } = require('./utils/musicUtils')
 
 connectDB()
@@ -58,60 +59,45 @@ client.on('message', async (message) => {
     }
     let link = null
     message.content.split(' ').map((word) => {
-      if (isTiktokLink(word)) link = word
+      if (isSlurpable(word)) link = word
     })
     if (link === null) return
-    if (isTiktokLink(link)) {
+    if (isSlurpable(link)) {
       try {
-        console.log(`[PROCESSING]: ${link}`)
+        console.log(`[PROCESSING]: ${link} for posting...`)
         await reactToMessage(message, '⬇️')
         // download video
         console.log(`downloading ${link}...`)
-        const response = await downloadTiktokVideo(link)
+        const response = await downloadVideoWithYdl(link)
         if (response) {
+          const options = {
+            vid_id: response.id,
+            link,
+            requester: message.author.tag,
+            filename: response.filename,
+            filepath: response.filepath,
+          }
           try {
-            const options = {
-              vid_id: response.id,
-              link,
-              requester: message.author.tag,
-              filename: response.filename,
-              filepath: response.filepath,
-            }
-            try {
-              console.log(`writing ${response.id} to db...`)
-              await TikTok.create(options)
-              console.log(`written.`)
-            } catch (err) {
-              console.error(`error writing to db: ${err}`)
-            }
+            console.log(`writing ${response.id} to db...`)
+            await TikTok.create(options)
+            console.log(`written.`)
+          } catch (err) {
+            console.error(`error writing to db: ${err}`)
+          }
+          if (!isNonPostable) {
             await reactToMessage(message, '🔄')
             const smallerPath =
               process.env.VIDEO_SMALLER_PATH + '/smaller-' + response.filename
-            try {
-              await makeVideoSmaller(response.filepath, smallerPath, 8000000)
-            } catch {
-              await reactToMessage(message, '💣')
-              return
-            }
+            await makeVideoSmaller(response.filepath, smallerPath, 8000000)
             console.log(`uploading ${smallerPath}...`)
             await reactToMessage(message, '⬆️')
             let msg = ''
-            try {
-              await message.inlineReply(msg, {
-                files: [smallerPath],
-              })
-              console.log(`sent ${smallerPath}`)
-              await reactToMessage(message, '💾')
-            } catch (err) {
-              console.error(err)
-              await reactToMessage(message, '❌')
-              await message.react('⬆')
-            }
-          } catch (err) {
-            console.error(err)
-            await reactToMessage(message, '❌')
-            await message.react('💾')
+            await message.inlineReply(msg, {
+              files: [smallerPath],
+            })
+            console.log(`sent ${smallerPath}`)
           }
+          await reactToMessage(message, '💾')
         } else {
           await reactToMessage(message, '❌')
         }
