@@ -7,21 +7,22 @@ const { v4 } = require('uuid')
 const ydl = require('youtube-dl-exec')
 
 exports.isSlurpable = (link) => {
+  const li = (str) => link.includes(str)
   return (
-    (link.includes('http') &&
-      link.includes('://') &&
-      ((link.includes('twitch') && link.includes('clip')) ||
-        link.includes('tiktok') ||
-        link.includes('twitter') ||
-        link.includes('facebook') ||
-        link.includes('reddit'))) ||
-    ((link.includes('youtube.com/watch') || link.includes('youtu.be')) &&
-      !link.includes('list'))
+    (li('http') &&
+      li('://') &&
+      ((li('twitch') && li('clip')) ||
+        li('tiktok') ||
+        li('twitter') ||
+        li('facebook') ||
+        li('reddit'))) ||
+    ((li('youtube.com/watch') || li('youtu.be')) && !li('list'))
   )
 }
 
 exports.isNonPostable = (link) => {
-  return link.includes('youtube.com/watch') || link.includes('youtu.be')
+  const li = (str) => link.includes(str)
+  return li('youtube.com/watch') || li('youtu.be')
 }
 
 exports.downloadVideoWithYdl = async (link) => {
@@ -32,10 +33,6 @@ exports.downloadVideoWithYdl = async (link) => {
   console.log(`downloading ${link} to ${filepath}...`)
   await ydl(link, { q: true, o: filepath })
   return { id, filename, filepath }
-}
-
-exports.downloadWithYdl = async (link, filepath) => {
-  await ydl(link, { q: true }, { cwd: filepath })
 }
 
 exports.downloadFile = async (fileUrl, outputLocationPath) => {
@@ -49,9 +46,6 @@ exports.downloadFile = async (fileUrl, outputLocationPath) => {
     headers: {
       'user-agent':
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36',
-      referer: 'https://www.tiktok.com/',
-      cookie: `tt_webid_v2=689854141086886123`,
-      //cookie: `tt_webid_v2=${cookieID}`,
     },
   }).then(async (response) => {
     response.data.pipe(writer)
