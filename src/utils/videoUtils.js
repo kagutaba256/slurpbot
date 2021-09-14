@@ -15,8 +15,8 @@ exports.isSlurpable = (link) => {
         link.includes('twitter') ||
         link.includes('facebook') ||
         link.includes('reddit'))) ||
-    link.includes('youtube.com/watch') ||
-    link.includes('youtu.be')
+    ((link.includes('youtube.com/watch') || link.includes('youtu.be')) &&
+      !link.includes('list'))
   )
 }
 
