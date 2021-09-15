@@ -3,6 +3,7 @@ require('colors')
 const discord = require('discord.js')
 require('./utils/ExtendedMessage')
 const { v4 } = require('uuid')
+const sha1File = require('sha1-file')
 const { reactToMessage } = require('./utils/messageUtils')
 const { connectDB } = require('./utils/db')
 const TikTok = require('./models/tiktokModel')
@@ -67,14 +68,8 @@ client.on('message', async (message) => {
         console.log(`checking if ${link} exists...`)
         const result = await TikTok.findOne({ link })
         if (result) {
-          await reactToMessage(message, '⬆️')
-          let contentPath = null
-          if (!isNonPostable(link)) contentPath = result.filepath
-          await message.inlineReply(
-            `\`\`\`diff\n- ALREADY LINKED BY ${result.requester} ON ${result.dateConverted}.\`\`\``
-          )
-          await message.inlineReply('', { files: [contentPath] })
-          await reactToMessage(message, '🤡')
+          console.log(`link found at ${result.id}`)
+          await alreadyBeenPosted(message, link, result)
           return
         }
         console.log(`[PROCESSING]: ${link} for posting...`)
@@ -83,23 +78,18 @@ client.on('message', async (message) => {
         console.log(`downloading ${link}...`)
         const response = await downloadVideoWithYdl(link)
         if (response) {
-          const options = {
-            vid_id: response.id,
-            link,
-            requester: message.author.tag,
-            filename: response.filename,
-            filepath: response.filepath,
+          console.log(`checking ${link}'s hash...'`)
+          const hash = await sha1File(response.filepath)
+          const result = await TikTok.findOne({ hash })
+          if (result) {
+            console.log(`hash found at ${result.id}`)
+            await alreadyBeenPosted(message, link, result)
+            return
           }
-          try {
-            console.log(`writing ${response.id} to db...`)
-            await TikTok.create(options)
-            console.log(`written.`)
-          } catch (err) {
-            console.error(`error writing to db: ${err}`)
-          }
+          let smallerPath = null
           if (!isNonPostable(link)) {
             await reactToMessage(message, '🔄')
-            const smallerPath =
+            smallerPath =
               process.env.VIDEO_SMALLER_PATH + '/smaller-' + response.filename
             await makeVideoSmaller(response.filepath, smallerPath, 8000000)
             console.log(`uploading ${smallerPath}...`)
@@ -109,6 +99,22 @@ client.on('message', async (message) => {
               files: [smallerPath],
             })
             console.log(`sent ${smallerPath}`)
+          }
+          const options = {
+            vid_id: response.id,
+            link,
+            requester: message.author.tag,
+            filename: response.filename,
+            filepath: response.filepath,
+            smallpath: smallerPath,
+            hash,
+          }
+          try {
+            console.log(`writing ${response.id} to db...`)
+            await TikTok.create(options)
+            console.log(`written.`)
+          } catch (err) {
+            console.error(`error writing to db: ${err}`)
           }
           await reactToMessage(message, '💾')
         } else {
@@ -163,5 +169,20 @@ client.on('message', async (message) => {
     }
   }
 })
+
+const alreadyBeenPosted = async (message, link, result) => {
+  await reactToMessage(message, '⬆️')
+  let contentPath = null
+  if (!isNonPostable(link)) {
+    if (result.smallerPath !== null) contentPath = result.smallpath
+    else contentPath = result.filepath
+  }
+  await message.inlineReply(
+    `\`\`\`diff\n- ALREADY LINKED BY ${result.requester} ON ${result.dateConverted}.\`\`\``
+  )
+  await message.inlineReply('', { files: [contentPath] })
+  await reactToMessage(message, '🤡')
+  return
+}
 
 client.login(process.env.TOKEN)

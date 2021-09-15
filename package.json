@@ -19,6 +19,7 @@
     "js-file-download": "^0.4.12",
     "mkdirp": "^1.0.4",
     "mongoose": "^5.13.5",
+    "sha1-file": "^2.0.0",
     "slugify": "^1.6.0",
     "tiktok-scraper": "^1.4.33",
     "uuid": "^8.3.2",

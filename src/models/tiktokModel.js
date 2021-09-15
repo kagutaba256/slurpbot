@@ -11,6 +11,12 @@ const tiktokSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  smallpath: {
+    type: String,
+  },
+  hash: {
+    type: String,
+  },
   dateConverted: {
     type: Date,
     default: Date.now,
