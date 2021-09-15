@@ -8,7 +8,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "download-songs": "node utils/song-downloader.js"
+    "download-songs": "node utils/song-downloader.js",
+    "update-hashes": "node utils/hash-updater.js"
   },
   "dependencies": {
     "axios": "^0.21.1",
