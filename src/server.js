@@ -85,7 +85,9 @@ client.on('message', async (message) => {
           if (result) {
             console.log(`hash found at ${result.id}`)
             await alreadyBeenPosted(message, link, result)
+            console.log(`deleting ${response.filepath}...`)
             await fs.unlinkSync(response.filepath)
+            console.log(`deleted ${response.filepath}`)
             return
           }
           let smallerPath = null
@@ -179,19 +181,7 @@ const alreadyBeenPosted = async (message, link, result) => {
     let contentPath = null
     if (!isNonPostable(link)) {
       if (result.smallerPath) contentPath = result.smallpath
-      else {
-        await reactToMessage(message, '🔄')
-        smallerPath =
-          process.env.VIDEO_SMALLER_PATH + '/smaller-' + response.filename
-        await makeVideoSmaller(response.filepath, smallerPath, 8000000)
-        console.log(`uploading ${smallerPath}...`)
-        await reactToMessage(message, '⬆️')
-        let msg = ''
-        await message.inlineReply(msg, {
-          files: [smallerPath],
-        })
-        console.log(`sent ${smallerPath}`)
-      }
+      else contentPath = result.filepath
     }
     let text = `\`\`\`diff\n- ALREADY LINKED BY ${result.requester} ON ${result.dateConverted}.\`\`\``
     if (result.messageid) {
