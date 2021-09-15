@@ -174,21 +174,37 @@ client.on('message', async (message) => {
 })
 
 const alreadyBeenPosted = async (message, link, result) => {
-  await reactToMessage(message, '⬆️')
-  let contentPath = null
-  if (!isNonPostable(link)) {
-    if (result.smallerPath) contentPath = result.smallpath
-    else contentPath = result.filepath
+  try {
+    await reactToMessage(message, '⬆️')
+    let contentPath = null
+    if (!isNonPostable(link)) {
+      if (result.smallerPath) contentPath = result.smallpath
+      else {
+        await reactToMessage(message, '🔄')
+        smallerPath =
+          process.env.VIDEO_SMALLER_PATH + '/smaller-' + response.filename
+        await makeVideoSmaller(response.filepath, smallerPath, 8000000)
+        console.log(`uploading ${smallerPath}...`)
+        await reactToMessage(message, '⬆️')
+        let msg = ''
+        await message.inlineReply(msg, {
+          files: [smallerPath],
+        })
+        console.log(`sent ${smallerPath}`)
+      }
+    }
+    let text = `\`\`\`diff\n- ALREADY LINKED BY ${result.requester} ON ${result.dateConverted}.\`\`\``
+    if (result.messageid) {
+      const original = await message.channel.messages.fetch(result.messageid)
+      text += '```diff\n- THIS IS A REPLY TO THE ORIGINAL LINK.```'
+      original.inlineReply(text)
+    } else message.inlineReply(text)
+    await message.inlineReply('', { files: [contentPath] })
+    await reactToMessage(message, '🤡')
+  } catch (err) {
+    console.error(err)
+    await reactToMessage(message, '🤡')
   }
-  let text = `\`\`\`diff\n- ALREADY LINKED BY ${result.requester} ON ${result.dateConverted}.\`\`\``
-  if (result.messageid) {
-    const original = await message.channel.messages.fetch(result.messageid)
-    text += '```diff\n- THIS IS A REPLY TO THE ORIGINAL LINK.```'
-    original.inlineReply(text)
-  } else message.inlineReply(text)
-  await message.inlineReply('', { files: [contentPath] })
-  await reactToMessage(message, '🤡')
-  return
 }
 
 client.login(process.env.TOKEN)
