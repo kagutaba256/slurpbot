@@ -71,9 +71,6 @@ client.on('message', async (message) => {
         if (result) {
           console.log(`link found at ${result.id}`)
           await alreadyBeenPosted(message, link, result)
-          console.log(`deleting ${response.filepath}...`)
-          await fs.unlinkSync(response.filepath)
-          console.log(`deleted ${response.filepath}`)
           return
         }
         console.log(`[PROCESSING]: ${link} for posting...`)
@@ -180,7 +177,7 @@ const alreadyBeenPosted = async (message, link, result) => {
   await reactToMessage(message, '⬆️')
   let contentPath = null
   if (!isNonPostable(link)) {
-    if (result.smallerPath !== null) contentPath = result.smallpath
+    if (result.smallerPath) contentPath = result.smallpath
     else contentPath = result.filepath
   }
   let text = `\`\`\`diff\n- ALREADY LINKED BY ${result.requester} ON ${result.dateConverted}.\`\`\``
