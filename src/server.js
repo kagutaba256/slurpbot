@@ -64,6 +64,19 @@ client.on('message', async (message) => {
     if (link === null) return
     if (isSlurpable(link)) {
       try {
+        console.log(`checking if ${link} exists...`)
+        const result = await TikTok.findOne({ link })
+        if (result) {
+          await reactToMessage(message, '⬆️')
+          let contentPath = null
+          if (!isNonPostable(link)) contentPath = result.filepath
+          await message.inlineReply(
+            `\`\`\`diff\n- ALREADY LINKED BY ${result.requester} ON ${result.dateConverted}.\`\`\``
+          )
+          await message.inlineReply('', { files: [contentPath] })
+          await reactToMessage(message, '🤡')
+          return
+        }
         console.log(`[PROCESSING]: ${link} for posting...`)
         await reactToMessage(message, '⬇️')
         // download video
