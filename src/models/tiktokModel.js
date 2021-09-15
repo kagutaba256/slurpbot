@@ -17,6 +17,9 @@ const tiktokSchema = mongoose.Schema({
   hash: {
     type: String,
   },
+  messageid: {
+    type: String,
+  },
   dateConverted: {
     type: Date,
     default: Date.now,

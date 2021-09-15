@@ -4,6 +4,7 @@ const discord = require('discord.js')
 require('./utils/ExtendedMessage')
 const { v4 } = require('uuid')
 const sha1File = require('sha1-file')
+const fs = require('fs')
 const { reactToMessage } = require('./utils/messageUtils')
 const { connectDB } = require('./utils/db')
 const TikTok = require('./models/tiktokModel')
@@ -70,6 +71,9 @@ client.on('message', async (message) => {
         if (result) {
           console.log(`link found at ${result.id}`)
           await alreadyBeenPosted(message, link, result)
+          console.log(`deleting ${response.filepath}...`)
+          await fs.unlinkSync(response.filepath)
+          console.log(`deleted ${response.filepath}`)
           return
         }
         console.log(`[PROCESSING]: ${link} for posting...`)
@@ -84,6 +88,7 @@ client.on('message', async (message) => {
           if (result) {
             console.log(`hash found at ${result.id}`)
             await alreadyBeenPosted(message, link, result)
+            await fs.unlinkSync(response.filepath)
             return
           }
           let smallerPath = null
@@ -108,6 +113,7 @@ client.on('message', async (message) => {
             filepath: response.filepath,
             smallpath: smallerPath,
             hash,
+            messageid: message.id,
           }
           try {
             console.log(`writing ${response.id} to db...`)
@@ -177,9 +183,12 @@ const alreadyBeenPosted = async (message, link, result) => {
     if (result.smallerPath !== null) contentPath = result.smallpath
     else contentPath = result.filepath
   }
-  await message.inlineReply(
-    `\`\`\`diff\n- ALREADY LINKED BY ${result.requester} ON ${result.dateConverted}.\`\`\``
-  )
+  let text = `\`\`\`diff\n- ALREADY LINKED BY ${result.requester} ON ${result.dateConverted}.\`\`\``
+  if (result.messageid) {
+    const original = await message.channel.messages.fetch(result.messageid)
+    text += '```diff\n- THIS IS A REPLY TO THE ORIGINAL LINK.```'
+    original.inlineReply(text)
+  } else message.inlineReply(text)
   await message.inlineReply('', { files: [contentPath] })
   await reactToMessage(message, '🤡')
   return
