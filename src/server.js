@@ -175,11 +175,26 @@ client.on('message', async (message) => {
       }
     }
   } else if (message.channel.id === process.env.REQUESTS_CHANNEL_ID) {
-    if (message.content.includes('!random')) {
+    const prefix = '!'
+    const { content } = message
+    if (!content.startsWith(prefix)) return
+    if (content.includes('help')) {
+      printHelpMessage(message)
+    } else if (content.includes('random')) {
       sendRandomVideo(message)
     }
   }
 })
+
+const printHelpMessage = async (message) => {
+  let helpMessage = `
+    \`\`\`==🍹== SLURPBOT'S CURRENT COMMANDS ==🍹==\n
+    !help - prints this message.
+    !random - sends a random video
+    \`\`\`
+  `
+  await message.inlineReply(helpMessage)
+}
 
 const getTimeString = (date) =>
   date.toLocaleDateString('en-US', {
