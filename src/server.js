@@ -225,39 +225,42 @@ const sendRandomVideo = async (message) => {
     console.log(`${message.author.tag} requests random video`)
     await reactToMessage(message, '🔍')
     const results = await TikTok.find()
+    let path
     let randomResult
     for (i = 0; i < results.length; i++) {
       randomResult = results[Math.floor(Math.random() * results.length)]
       if (
-        //TODO TEMPORARY
+        randomResult.smallpath &&
+        (await fs.existsSync(randomResult.smallpath))
+      ) {
+        console.log(`found a smallpath`.blue.inverse)
+        path = randomResult.smallpath
+        break
+      } else if (
         randomResult.filepath &&
         (await fs.existsSync(randomResult.filepath))
       ) {
         if (await checkFileSize(randomResult.filepath, 8)) {
+          console.log(`found a regular path`.yellow.inverse)
+          path = randomResult.filepath
           break
         }
-        // else if(randomResult.smallpath) {
-        //   break
-        //   }
       }
     }
-    if (await fs.existsSync(randomResult.filepath)) {
-      console.log(`found ${randomResult.link}`)
+    if (await fs.existsSync(path)) {
+      console.log(`found ${path}`)
       await reactToMessage(message, '⬆️')
-      const { link, requester, dateConverted, smallpath, filepath } =
-        randomResult
-
-      // TODO TEMPORARY FUNCTIONALITY
+      const { link, requester, dateConverted } = randomResult
 
       let msg = `\`ORIGINAL LINK:\` ${link}\n\`REQUESTER:\` ${requester}\n\`DATE SLURPED:\` ${getTimeString(
         dateConverted
       )}`
-      console.log(`uploading ${filepath}...`)
+      console.log(`uploading ${path}...`)
       await message.inlineReply(msg, {
-        files: [filepath],
+        files: [path],
       })
       await reactToMessage(message, '🎲')
-      console.log(`done uploading ${filepath}`)
+      console.log(`done uploading ${path}`)
       return
     }
     await reactToMessage(message, '❌')
