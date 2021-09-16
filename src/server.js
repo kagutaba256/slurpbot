@@ -192,6 +192,8 @@ client.on('message', async (message) => {
       sendRandomVideo(message)
     } else if (content.includes('slurpfolder')) {
       printGoogleDriveLink(message)
+    } else if (content.includes('github')) {
+      printGithubLink(message)
     }
   }
 })
@@ -200,12 +202,17 @@ const printGoogleDriveLink = async (message) => {
   await message.inlineReply(process.env.GOOGLE_DRIVE_LINK)
 }
 
+const printGithubLink = async (message) => {
+  await message.inlineReply(process.env.GITHUB_LINK)
+}
+
 const printHelpMessage = async (message) => {
   let helpMessage = `
     \`\`\`==🍹== SLURPBOT'S CURRENT COMMANDS ==🍹==\n
     !help - prints this message.
     !random - sends a random video
     !slurpfolder - links to the slurpfolder (google drive)
+    !github - links to the github repo
     \`\`\`
   `
   await message.inlineReply(helpMessage)
