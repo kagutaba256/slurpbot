@@ -290,7 +290,7 @@ const alreadyBeenPosted = async (message, link, result) => {
     await reactToMessage(message, '⬆️')
     let contentPath = null
     if (!isNonPostable(link)) {
-      if (result.smallerPath) contentPath = result.smallpath
+      if (result.smallpath) contentPath = result.smallpath
       else contentPath = result.filepath
     }
     let text = `\`\`\`diff\n- ALREADY LINKED BY ${
