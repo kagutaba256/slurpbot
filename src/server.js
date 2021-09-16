@@ -94,17 +94,26 @@ client.on('message', async (message) => {
           }
           let smallerPath = null
           if (!isNonPostable(link)) {
-            await reactToMessage(message, '🔄')
-            smallerPath =
-              process.env.VIDEO_SMALLER_PATH + '/smaller-' + response.filename
-            await makeVideoSmaller(response.filepath, smallerPath, 8000000)
-            console.log(`uploading ${smallerPath}...`)
+            let toSend
+            console.log(`checking ${response.filepath}'s filesize...`)
+            if (!checkFileSize(response.filepath, 8)) {
+              console.log(`too big. we have to shrink it.`)
+              await reactToMessage(message, '🔄')
+              smallerPath =
+                process.env.VIDEO_SMALLER_PATH + '/smaller-' + response.filename
+              await makeVideoSmaller(response.filepath, smallerPath, 8000000)
+              toSend = smallerPath
+            } else {
+              console.log(`it's small enough`)
+              toSend = response.filepath
+            }
+            console.log(`uploading ${toSend}...`)
             await reactToMessage(message, '⬆️')
             let msg = ''
             await message.inlineReply(msg, {
-              files: [smallerPath],
+              files: [toSend],
             })
-            console.log(`sent ${smallerPath}`)
+            console.log(`sent ${toSend}`)
           }
           const options = {
             vid_id: response.id,
@@ -218,8 +227,12 @@ const sendRandomVideo = async (message) => {
         randomResult.filepath &&
         (await fs.existsSync(randomResult.filepath))
       ) {
-        const { size } = fs.statSync(randomResult.filepath)
-        if (size / (1024 * 1024) < 8) break
+        if (checkFileSize(randomResult.filepath, 8)) {
+          break
+        }
+        // else if(randomResult.smallpath) {
+        //   break
+        //   }
       }
     }
     if (await fs.existsSync(randomResult.filepath)) {
@@ -248,6 +261,11 @@ const sendRandomVideo = async (message) => {
     await reactToMessage(message, '❗')
     return
   }
+}
+
+const checkFileSize = async (file, target) => {
+  const { size } = await fs.statSync(file)
+  return size / (1024 * 1024) < target
 }
 
 const alreadyBeenPosted = async (message, link, result) => {
