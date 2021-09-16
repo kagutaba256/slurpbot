@@ -190,22 +190,29 @@ const sendRandomVideo = async (message) => {
     for (i = 0; i < results.length; i++) {
       randomResult = results[Math.floor(Math.random() * results.length)]
       if (
-        randomResult.smallpath &&
-        (await fs.existsSync(randomResult.smallpath))
-      )
-        break
+        //TODO TEMPORARY
+        randomResult.filepath &&
+        (await fs.existsSync(randomResult.filepath))
+      ) {
+        const { size } = fs.statSync(randomResult.filepath)
+        if (size / (1024 * 1024) < 8) break
+      }
     }
-    if (await fs.existsSync(randomResult.smallpath)) {
+    if (await fs.existsSync(randomResult.filepath)) {
       console.log(`found ${randomResult.link}`)
       await reactToMessage(message, '⬆️')
-      const { link, requester, dateConverted, smallpath } = randomResult
+      const { link, requester, dateConverted, smallpath, filepath } =
+        randomResult
+
+      // TODO TEMPORARY FUNCTIONALITY
+
       let msg = `ORIGINAL LINK: ${link}\nREQUESTER: ${requester}\nDATE SLURPED: ${dateConverted}`
-      console.log(`uploading ${smallpath}...`)
+      console.log(`uploading ${filepath}...`)
       await message.inlineReply(msg, {
-        files: [smallpath],
+        files: [filepath],
       })
       await reactToMessage(message, '🎲')
-      console.log(`done uploading ${smallpath}`)
+      console.log(`done uploading ${filepath}`)
       return
     }
     await reactToMessage(message, '❌')
