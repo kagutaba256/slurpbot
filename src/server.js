@@ -180,6 +180,15 @@ client.on('message', async (message) => {
   }
 })
 
+const getTimeString = (date) =>
+  date.toLocaleDateString('en-US', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }) +
+  ' ' +
+  date.toLocaleTimeString()
+
 const sendRandomVideo = async (message) => {
   try {
     console.log(`${message.author.tag} requests random video`)
@@ -205,7 +214,9 @@ const sendRandomVideo = async (message) => {
 
       // TODO TEMPORARY FUNCTIONALITY
 
-      let msg = `\`ORIGINAL LINK:\` ${link}\n\`REQUESTER:\` ${requester}\n\`DATE SLURPED:\` ${dateConverted}`
+      let msg = `\`ORIGINAL LINK:\` ${link}\n\`REQUESTER:\` ${requester}\n\`DATE SLURPED:\` ${getTimeString(
+        dateConverted
+      )}`
       console.log(`uploading ${filepath}...`)
       await message.inlineReply(msg, {
         files: [filepath],
@@ -231,7 +242,9 @@ const alreadyBeenPosted = async (message, link, result) => {
       if (result.smallerPath) contentPath = result.smallpath
       else contentPath = result.filepath
     }
-    let text = `\`\`\`diff\n- ALREADY LINKED BY ${result.requester} ON ${result.dateConverted}.\`\`\``
+    let text = `\`\`\`diff\n- ALREADY LINKED BY ${
+      result.requester
+    } ON ${getTimeString(result.dateConverted)}.\`\`\``
     if (result.messageid) {
       const original = await message.channel.messages.fetch(result.messageid)
       text += '```diff\n- THIS IS A REPLY TO THE ORIGINAL LINK.```'
