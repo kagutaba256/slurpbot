@@ -94,26 +94,25 @@ client.on('message', async (message) => {
           }
           let smallerPath = null
           if (!isNonPostable(link)) {
-            let toSend
-            console.log(`checking ${response.filepath}'s filesize...`)
-            if (!checkFileSize(response.filepath, 8)) {
-              console.log(`too big. we have to shrink it.`)
-              await reactToMessage(message, '🔄')
-              smallerPath =
-                process.env.VIDEO_SMALLER_PATH + '/smaller-' + response.filename
-              await makeVideoSmaller(response.filepath, smallerPath, 8000000)
-              toSend = smallerPath
-            } else {
-              console.log(`it's small enough`)
-              toSend = response.filepath
+            let shouldShrink = false
+            console.log(`converting ${response.filepath}`)
+            if (!(await checkFileSize(response.filepath, 8))) {
+              console.log(
+                `we need to shrink ${response.filepath}`.yellow.inverse
+              )
+              shouldShrink = true
             }
-            console.log(`uploading ${toSend}...`)
+            await reactToMessage(message, '🔄')
+            smallerPath =
+              process.env.VIDEO_SMALLER_PATH + '/smaller-' + response.filename
+            await makeVideoSmaller(response.filepath, smallerPath, shouldShrink)
+            console.log(`uploading ${smallerPath}...`)
             await reactToMessage(message, '⬆️')
             let msg = ''
             await message.inlineReply(msg, {
-              files: [toSend],
+              files: [smallerPath],
             })
-            console.log(`sent ${toSend}`)
+            console.log(`sent ${smallerPath}`)
           }
           const options = {
             vid_id: response.id,
@@ -272,7 +271,8 @@ const sendRandomVideo = async (message) => {
 
 const checkFileSize = async (file, target) => {
   const { size } = await fs.statSync(file)
-  return size / (1024 * 1024) < target
+  const bigness = size / (1024 * 1024)
+  return bigness < target
 }
 
 const alreadyBeenPosted = async (message, link, result) => {
@@ -291,7 +291,9 @@ const alreadyBeenPosted = async (message, link, result) => {
       text += '```diff\n- THIS IS A REPLY TO THE ORIGINAL LINK.```'
       original.inlineReply(text)
     } else message.inlineReply(text)
+    console.log('uploading old video...')
     await message.inlineReply('', { files: [contentPath] })
+    console.log(`done uploading ${contentPath}`)
     await reactToMessage(message, '🤡')
   } catch (err) {
     console.error(err)

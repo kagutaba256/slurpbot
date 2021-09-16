@@ -53,22 +53,31 @@ exports.downloadFile = async (fileUrl, outputLocationPath) => {
   })
 }
 
-exports.makeVideoSmaller = async (input, output, sizeTarget) => {
+exports.makeVideoSmaller = async (input, output, shrink) => {
   function ffConvert() {
     return new Promise((resolve, reject) => {
-      console.log('doing things')
       try {
+        let outputOptions = []
+        let slownessOptions = []
+        if (shrink) {
+          outputOptions = ['-crf', '40']
+          slownessOptions = ['-preset', 'medium']
+        } else {
+          outputOptions = ['-crf', '28']
+          slownessOptions = ['-preset', 'faster']
+        }
         ffmpeg()
           .input(input)
           .inputFormat('mp4')
           .outputOptions('-vcodec', 'libx264')
           //.outputOptions('-preset', 'slower')
-          .outputOptions('-crf', '32')
+          .outputOptions(outputOptions)
+          .outputOptions(slownessOptions)
           .on('progress', (progress) =>
             console.log('converting: ' + progress.timemark)
           )
           .save(output)
-          .on('end', async (stdout, stderr) => {
+          .on('end', async () => {
             console.log(`done converting ${output}`)
             resolve()
           })
