@@ -233,7 +233,7 @@ const sendRandomVideo = async (message) => {
         randomResult.filepath &&
         (await fs.existsSync(randomResult.filepath))
       ) {
-        if (checkFileSize(randomResult.filepath, 8)) {
+        if (await checkFileSize(randomResult.filepath, 8)) {
           break
         }
         // else if(randomResult.smallpath) {
