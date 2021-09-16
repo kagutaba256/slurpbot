@@ -64,9 +64,6 @@ client.on('message', async (message) => {
       if (isSlurpable(word)) link = word
     })
     if (link === null) {
-      if (message.content.includes('!random')) {
-        sendRandomVideo(message)
-      }
       return
     }
     if (isSlurpable(link)) {
@@ -176,6 +173,10 @@ client.on('message', async (message) => {
         await reactToMessage(message, '❗')
         await message.react('💾')
       }
+    }
+  } else if (message.channel.id === process.env.REQUESTS_CHANNEL_ID) {
+    if (message.content.includes('!random')) {
+      sendRandomVideo(message)
     }
   }
 })
