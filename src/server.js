@@ -191,15 +191,22 @@ client.on('message', async (message) => {
       printHelpMessage(message)
     } else if (content.includes('random')) {
       sendRandomVideo(message)
+    } else if (content.includes('slurpfolder')) {
+      printGoogleDriveLink(message)
     }
   }
 })
+
+const printGoogleDriveLink = async (message) => {
+  await message.inlineReply(process.env.GOOGLE_DRIVE_LINK)
+}
 
 const printHelpMessage = async (message) => {
   let helpMessage = `
     \`\`\`==🍹== SLURPBOT'S CURRENT COMMANDS ==🍹==\n
     !help - prints this message.
     !random - sends a random video
+    !slurpfolder - links to the slurpfolder (google drive)
     \`\`\`
   `
   await message.inlineReply(helpMessage)
