@@ -63,7 +63,12 @@ client.on('message', async (message) => {
     message.content.split(' ').map((word) => {
       if (isSlurpable(word)) link = word
     })
-    if (link === null) return
+    if (link === null) {
+      if (message.content.includes('!random')) {
+        sendRandomVideo(message)
+      }
+      return
+    }
     if (isSlurpable(link)) {
       try {
         console.log(`checking if ${link} exists...`)
@@ -174,6 +179,43 @@ client.on('message', async (message) => {
     }
   }
 })
+
+const sendRandomVideo = async (message) => {
+  try {
+    console.log(`${message.author.tag} requests random video`)
+    await reactToMessage(message, '🔍')
+    const results = await TikTok.find()
+    let file = ''
+    let randomResult
+    for (i = 0; i < results.length; i++) {
+      randomResult = results[Math.floor(Math.random() * results.length)]
+      if (
+        randomResult.smallpath &&
+        (await fs.existsSync(randomResult.smallpath))
+      )
+        break
+    }
+    if (await fs.existsSync(randomResult.smallpath)) {
+      console.log(`found ${randomResult.link}`)
+      await reactToMessage(message, '⬆️')
+      const { link, requester, dateConverted, smallpath } = randomResult
+      let msg = `ORIGINAL LINK: ${link}\nREQUESTER: ${requester}\nDATE SLURPED: ${dateConverted}`
+      console.log(`uploading ${smallpath}...`)
+      await message.inlineReply(msg, {
+        files: [smallpath],
+      })
+      await reactToMessage(message, '🎲')
+      console.log(`done uploading ${smallpath}`)
+      return
+    }
+    await reactToMessage(message, '❌')
+    return
+  } catch (err) {
+    console.error(err)
+    await reactToMessage(message, '❗')
+    return
+  }
+}
 
 const alreadyBeenPosted = async (message, link, result) => {
   try {
