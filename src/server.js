@@ -185,7 +185,6 @@ const sendRandomVideo = async (message) => {
     console.log(`${message.author.tag} requests random video`)
     await reactToMessage(message, '🔍')
     const results = await TikTok.find()
-    let file = ''
     let randomResult
     for (i = 0; i < results.length; i++) {
       randomResult = results[Math.floor(Math.random() * results.length)]
@@ -206,7 +205,7 @@ const sendRandomVideo = async (message) => {
 
       // TODO TEMPORARY FUNCTIONALITY
 
-      let msg = `ORIGINAL LINK: ${link}\nREQUESTER: ${requester}\nDATE SLURPED: ${dateConverted}`
+      let msg = `\`ORIGINAL LINK:\` ${link}\n\`REQUESTER:\` ${requester}\n\`DATE SLURPED:\` ${dateConverted}`
       console.log(`uploading ${filepath}...`)
       await message.inlineReply(msg, {
         files: [filepath],
