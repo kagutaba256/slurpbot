@@ -22,7 +22,7 @@ exports.isSlurpable = (link) => {
 
 exports.isNonPostable = (link) => {
   const li = (str) => link.includes(str)
-  return li('youtube.com/watch') || li('youtu.be')
+  return li('youtube.com/watch') || li('youtu.be') || li('twitch')
 }
 
 exports.downloadVideoWithYdl = async (link) => {
