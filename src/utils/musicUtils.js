@@ -2,14 +2,7 @@ const { v4 } = require('uuid')
 const ydl = require('youtube-dl-exec')
 
 exports.isMusicLink = (link) => {
-  const valid = [
-    'http',
-    'https',
-    'youtube.com',
-    'youtu.be',
-    'soundcloud.com',
-    'bandcamp.com',
-  ]
+  const valid = ['youtube.com', 'youtu.be', 'soundcloud.com', 'bandcamp.com']
   return new RegExp(valid.join('|')).test(link)
 }
 
