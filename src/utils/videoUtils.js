@@ -29,9 +29,14 @@ exports.downloadVideoWithYdl = async (link) => {
   const id = v4()
   const filename = id + '.mp4'
   const path = process.env.VIDEO_PATH
+  const cookies = process.env.COOKIES_PATH
   const filepath = path + '/' + filename
   console.log(`downloading ${link} to ${filepath}...`)
-  await ydl(link, { q: true, o: filepath })
+  await ydl(link, {
+    q: true,
+    o: filepath,
+    cookies,
+  })
   return { id, filename, filepath }
 }
 
