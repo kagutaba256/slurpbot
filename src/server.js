@@ -227,6 +227,9 @@ const getTimeString = (date) =>
   ' ' +
   date.toLocaleTimeString()
 
+const getNumberOfDays = (difference) =>
+  (difference / (1000 * 3600 * 24)).toFixed(0)
+
 const sendRandomVideo = async (message) => {
   try {
     console.log(`${message.author.tag} requests random video`)
@@ -295,7 +298,10 @@ const alreadyBeenPosted = async (message, link, result) => {
     }
     let text = `\`\`\`diff\n- ALREADY LINKED BY ${
       result.requester
-    } ON ${getTimeString(result.dateConverted)}.\`\`\``
+    } ON ${getTimeString(result.dateConverted)}\n`
+    const timePassed = Date.now() - result.dateConverted
+    text += `- (${getNumberOfDays(timePassed)} DAYS AGO)\n`
+    text += '```'
     if (result.messageid) {
       const original = await message.channel.messages.fetch(result.messageid)
       text += '```diff\n- THIS IS A REPLY TO THE ORIGINAL LINK.```'
