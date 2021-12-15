@@ -16,7 +16,6 @@ exports.isSlurpable = (link) => {
         li('twitter') ||
         li('facebook') ||
         li('reddit') ||
-        li('instagram') ||
         li('bilibili'))) ||
     ((li('youtube.com/watch') || li('youtu.be')) && !li('list'))
   )
