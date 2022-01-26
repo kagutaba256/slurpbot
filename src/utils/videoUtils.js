@@ -39,6 +39,7 @@ exports.downloadVideoWithYdl = async (link) => {
     q: true,
     o: filepath,
     cookies,
+    userAgent: 'facebookexternalhit/1.1',
   })
   return { id, filename, filepath }
 }
