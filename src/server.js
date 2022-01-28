@@ -176,10 +176,10 @@ client.on('message', async (message) => {
           console.log(`sent`)
         }
         await reactToMessage(message, '💾')
+        await reactToMessage(message, ':ayaya:')
       } catch (err) {
         console.error(err)
         await reactToMessage(message, '❗')
-        await message.react('💾')
       }
     }
   } else if (message.channel.id === process.env.REQUESTS_CHANNEL_ID) {
