@@ -176,7 +176,6 @@ client.on('message', async (message) => {
           console.log(`sent`)
         }
         await reactToMessage(message, '💾')
-        await reactToMessage(message, ':ayaya:')
       } catch (err) {
         console.error(err)
         await reactToMessage(message, '❗')
