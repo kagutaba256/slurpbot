@@ -250,7 +250,7 @@ const sendRandomVideo = async (message) => {
         randomResult.filepath &&
         (await fs.existsSync(randomResult.filepath))
       ) {
-        if (await checkFileSize(randomResult.filepath, 8)) {
+        if (await checkFileSize(randomResult.filepath, 7.8)) {
           console.log(`found a regular path`.yellow.inverse)
           path = randomResult.filepath
           break
