@@ -69,7 +69,7 @@ exports.makeVideoSmaller = async (input, output, shrink) => {
         let outputOptions = []
         let slownessOptions = []
         if (shrink) {
-          outputOptions = ['-crf', '40']
+          outputOptions = ['-crf', '47']
           slownessOptions = ['-preset', 'medium']
         } else {
           outputOptions = ['-crf', '28']
