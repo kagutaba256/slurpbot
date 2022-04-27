@@ -12,21 +12,21 @@
     "update-hashes": "node utils/hash-updater.js"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.27.2",
     "colors": "^1.4.0",
-    "discord.js": "^12.5.3",
-    "dotenv": "^10.0.0",
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "js-file-download": "^0.4.12",
     "mkdirp": "^1.0.4",
-    "mongoose": "^5.13.5",
-    "sha1-file": "^2.0.0",
-    "slugify": "^1.6.0",
-    "tiktok-scraper": "^1.4.33",
+    "mongoose": "^6.3.1",
+    "sha1-file": "^3.0.0",
+    "slugify": "^1.6.5",
+    "tiktok-scraper": "^1.4.36",
     "uuid": "^8.3.2",
-    "youtube-dl-exec": "^1.2.5"
+    "youtube-dl-exec": "^2.0.11"
   },
   "devDependencies": {
-    "nodemon": "^2.0.12"
+    "nodemon": "^2.0.15"
   }
 }

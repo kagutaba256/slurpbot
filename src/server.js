@@ -96,7 +96,7 @@ client.on('message', async (message) => {
           if (!isNonPostable(link)) {
             let shouldShrink = false
             console.log(`converting ${response.filepath}`)
-            if (!(await checkFileSize(response.filepath, 8))) {
+            if (!(await checkFileSize(response.filepath, 7.8))) {
               console.log(
                 `we need to shrink ${response.filepath}`.yellow.inverse
               )
@@ -113,6 +113,7 @@ client.on('message', async (message) => {
               files: [smallerPath],
             })
             console.log(`sent ${smallerPath}`)
+	    await message.suppressEmbeds(true)
           }
           const options = {
             vid_id: response.id,
@@ -311,6 +312,7 @@ const alreadyBeenPosted = async (message, link, result) => {
     await message.inlineReply('', { files: [contentPath] })
     console.log(`done uploading ${contentPath}`)
     await reactToMessage(message, '🤡')
+    await message.suppressEmbeds(true)
   } catch (err) {
     console.error(err)
     await reactToMessage(message, '🤡')
