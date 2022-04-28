@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from "mongoose"
 const musicSchema = mongoose.Schema({
   link: {
     type: String,
@@ -25,4 +25,4 @@ const musicSchema = mongoose.Schema({
   },
 })
 
-module.exports = mongoose.model('music', musicSchema)
+export default mongoose.model('music', musicSchema)

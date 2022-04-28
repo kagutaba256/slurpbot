@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 const tiktokSchema = mongoose.Schema({
   title: {
     type: String,
@@ -44,4 +44,4 @@ const tiktokSchema = mongoose.Schema({
   },
 })
 
-module.exports = mongoose.model('tiktok', tiktokSchema)
+export default mongoose.model('tiktok', tiktokSchema)
