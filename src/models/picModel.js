@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 const picSchema = mongoose.Schema({
   filepath: {
     type: String,
@@ -13,4 +13,4 @@ const picSchema = mongoose.Schema({
   },
 })
 
-module.exports = mongoose.model('picture', picSchema)
+export default mongoose.model('picture', picSchema)

@@ -5,6 +5,7 @@
   "main": "server.js",
   "author": "sam little",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",

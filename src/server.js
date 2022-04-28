@@ -1,27 +1,28 @@
-require('dotenv').config({ path: './config/config.env' })
-require('colors')
-const discord = require('discord.js')
-require('./utils/ExtendedMessage')
-const { v4 } = require('uuid')
-const sha1File = require('sha1-file')
-const fs = require('fs')
-const { reactToMessage } = require('./utils/messageUtils')
-const { connectDB } = require('./utils/db')
-const TikTok = require('./models/tiktokModel')
-const Music = require('./models/musicModel')
-const Pic = require('./models/picModel')
-const {
+import dotenv from "dotenv"
+dotenv.config({ path: './config/config.env' })
+import colors from "colors"
+import discord, { MessageAttachment } from "discord.js"
+import { v4 } from 'uuid'
+import {sha1File} from 'sha1-file'
+import fs from "fs"
+import { reactToMessage } from './utils/messageUtils.js'
+import { connectDB } from './utils/db.js'
+import TikTok from './models/tiktokModel.js'
+import Music from './models/musicModel.js'
+import Pic from './models/picModel.js'
+//import "./utils/ExtendedMessage.js"
+import {
   isSlurpable,
   isNonPostable,
   downloadVideoWithYdl,
   makeVideoSmaller,
   downloadFile,
-} = require('./utils/videoUtils')
-const { isMusicLink, downloadMusicWithYdl } = require('./utils/musicUtils')
+} from './utils/videoUtils.js'
+import { isMusicLink, downloadMusicWithYdl } from './utils/musicUtils.js'
 
 connectDB()
 
-const client = new discord.Client()
+const client = new discord.Client({intents: ["GUILDS", "GUILD_MESSAGES"]})
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}`.bgGreen.black)
   client.user.setActivity('with my slurper', {
@@ -29,7 +30,7 @@ client.on('ready', () => {
   })
 })
 
-client.on('message', async (message) => {
+client.on('messageCreate', async (message) => {
   if (message.author.bot) return
   if (message.channel.id === process.env.VIDEO_CHANNEL_ID) {
     if (message.attachments.size > 0) {
@@ -108,12 +109,10 @@ client.on('message', async (message) => {
             await makeVideoSmaller(response.filepath, smallerPath, shouldShrink)
             console.log(`uploading ${smallerPath}...`)
             await reactToMessage(message, '⬆️')
-            let msg = ''
-            await message.inlineReply(msg, {
-              files: [smallerPath],
-            })
+            const embed = new discord.MessageEmbed()
+            await message.channel.send({embeds: [], files: [smallerPath]})
             console.log(`sent ${smallerPath}`)
-	    await message.suppressEmbeds(true)
+	          await message.suppressEmbeds(true)
           }
           const options = {
             vid_id: response.id,
@@ -200,11 +199,11 @@ client.on('message', async (message) => {
 })
 
 const printGoogleDriveLink = async (message) => {
-  await message.inlineReply(process.env.GOOGLE_DRIVE_LINK)
+  await message.reply(process.env.GOOGLE_DRIVE_LINK)
 }
 
 const printGithubLink = async (message) => {
-  await message.inlineReply(process.env.GITHUB_LINK)
+  await message.reply(process.env.GITHUB_LINK)
 }
 
 const printHelpMessage = async (message) => {
@@ -216,7 +215,7 @@ const printHelpMessage = async (message) => {
     !github - links to the github repo
     \`\`\`
   `
-  await message.inlineReply(helpMessage)
+  await message.reply(helpMessage)
 }
 
 const getTimeString = (date) =>
@@ -267,7 +266,7 @@ const sendRandomVideo = async (message) => {
         dateConverted
       )}`
       console.log(`uploading ${path}...`)
-      await message.inlineReply(msg, {
+      await message.reply(msg, {
         files: [path],
       })
       await reactToMessage(message, '🎲')
@@ -306,10 +305,10 @@ const alreadyBeenPosted = async (message, link, result) => {
     if (result.messageid) {
       const original = await message.channel.messages.fetch(result.messageid)
       text += '```diff\n- THIS IS A REPLY TO THE ORIGINAL LINK.```'
-      original.inlineReply(text)
-    } else message.inlineReply(text)
+      original.reply(text)
+    } else message.reply(text)
     console.log('uploading old video...')
-    await message.inlineReply('', { files: [contentPath] })
+    await message.reply('asdf', { files: [contentPath] })
     console.log(`done uploading ${contentPath}`)
     await reactToMessage(message, '🤡')
     await message.suppressEmbeds(true)

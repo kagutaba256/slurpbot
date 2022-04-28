@@ -1,12 +1,12 @@
-const axios = require('axios')
-const ffmpeg = require('fluent-ffmpeg')
-const stream = require('stream')
-const { promisify } = require('util')
-const { createWriteStream } = require('fs')
-const { v4 } = require('uuid')
-const ydl = require('youtube-dl-exec')
+import axios from 'axios'
+import ffmpeg from 'fluent-ffmpeg'
+import stream from 'stream'
+import { promisify } from 'util'
+import { createWriteStream } from 'fs'
+import { v4 } from 'uuid'
+import ydl from 'youtube-dl-exec'
 
-exports.isSlurpable = (link) => {
+export const isSlurpable = (link) => {
   const li = (str) => link.includes(str)
   return (
     (li('http') &&
@@ -21,14 +21,14 @@ exports.isSlurpable = (link) => {
   )
 }
 
-exports.isNonPostable = (link) => {
+export const isNonPostable = (link) => {
   const li = (str) => link.includes(str)
   return (
     li('youtube.com/watch') || li('youtu.be') || li('twitch') || li('bilibili')
   )
 }
 
-exports.downloadVideoWithYdl = async (link) => {
+export const downloadVideoWithYdl = async (link) => {
   const id = v4()
   const filename = id + '.mp4'
   const path = process.env.VIDEO_PATH
@@ -44,7 +44,7 @@ exports.downloadVideoWithYdl = async (link) => {
   return { id, filename, filepath }
 }
 
-exports.downloadFile = async (fileUrl, outputLocationPath) => {
+export const downloadFile = async (fileUrl, outputLocationPath) => {
   const finished = promisify(stream.finished)
   const writer = createWriteStream(outputLocationPath)
   return axios({
@@ -62,7 +62,7 @@ exports.downloadFile = async (fileUrl, outputLocationPath) => {
   })
 }
 
-exports.makeVideoSmaller = async (input, output, shrink) => {
+export const makeVideoSmaller = async (input, output, shrink) => {
   function ffConvert() {
     return new Promise((resolve, reject) => {
       try {
@@ -72,7 +72,7 @@ exports.makeVideoSmaller = async (input, output, shrink) => {
           outputOptions = ['-crf', '47']
           slownessOptions = ['-preset', 'slow']
         } else {
-          outputOptions = ['-crf', '35']
+          outputOptions = ['-crf', '45']
           slownessOptions = ['-preset', 'slow']
         }
         ffmpeg()

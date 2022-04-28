@@ -1,12 +1,12 @@
-const { v4 } = require('uuid')
-const ydl = require('youtube-dl-exec')
+import { v4 } from 'uuid'
+import ydl from 'youtube-dl-exec'
 
-exports.isMusicLink = (link) => {
+export const isMusicLink = (link) => {
   const valid = ['youtube.com', 'youtu.be', 'soundcloud', 'bandcamp.com']
   return new RegExp(valid.join('|')).test(link)
 }
 
-exports.downloadMusicWithYdl = async (link) => {
+export const downloadMusicWithYdl = async (link) => {
   const id = v4()
   const audioFormat = 'mp3'
   const filename = `${id}.${audioFormat}`
