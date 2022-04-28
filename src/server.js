@@ -10,7 +10,6 @@ import { connectDB } from './utils/db.js'
 import TikTok from './models/tiktokModel.js'
 import Music from './models/musicModel.js'
 import Pic from './models/picModel.js'
-//import "./utils/ExtendedMessage.js"
 import {
   isSlurpable,
   isNonPostable,
@@ -109,8 +108,7 @@ client.on('messageCreate', async (message) => {
             await makeVideoSmaller(response.filepath, smallerPath, shouldShrink)
             console.log(`uploading ${smallerPath}...`)
             await reactToMessage(message, '⬆️')
-            const embed = new discord.MessageEmbed()
-            await message.channel.send({embeds: [], files: [smallerPath]})
+            await message.reply({embeds: [], files: [smallerPath]})
             console.log(`sent ${smallerPath}`)
 	          await message.suppressEmbeds(true)
           }
@@ -266,9 +264,7 @@ const sendRandomVideo = async (message) => {
         dateConverted
       )}`
       console.log(`uploading ${path}...`)
-      await message.reply(msg, {
-        files: [path],
-      })
+      await message.reply({embeds: [], files: [path]})
       await reactToMessage(message, '🎲')
       console.log(`done uploading ${path}`)
       return
@@ -308,7 +304,7 @@ const alreadyBeenPosted = async (message, link, result) => {
       original.reply(text)
     } else message.reply(text)
     console.log('uploading old video...')
-    await message.reply('asdf', { files: [contentPath] })
+    await message.reply({embeds: [], files: [contentPath]})
     console.log(`done uploading ${contentPath}`)
     await reactToMessage(message, '🤡')
     await message.suppressEmbeds(true)
