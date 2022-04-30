@@ -72,7 +72,7 @@ export const makeVideoSmaller = async (input, output, shrink) => {
           outputOptions = ['-crf', '47']
           slownessOptions = ['-preset', 'slow']
         } else {
-          outputOptions = ['-crf', '45']
+          outputOptions = ['-crf', '34']
           slownessOptions = ['-preset', 'slow']
         }
         ffmpeg()
