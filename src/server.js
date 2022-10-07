@@ -94,7 +94,8 @@ client.on('messageCreate', async (message) => {
           }
           let smallerPath = null
           if (!isNonPostable(link)) {
-            let shouldShrink = false
+            //let shouldShrink = false
+            let shouldShrink = true
             console.log(`converting ${response.filepath}`)
             if (!(await checkFileSize(response.filepath, 7.8))) {
               console.log(
@@ -156,11 +157,14 @@ client.on('messageCreate', async (message) => {
     })
     console.log(`saved ${link}`)
     await reactToMessage(message, '💾')
+  } else if (message.channel.id === process.env.MAIN_CHANNEL_ID) {
+        if (message.author.id === process.env.MEOW_REACT_TO_THIS_ID) {
+            await message.react('1009595804434059274')
+	}
   } else if (message.channel.id === process.env.PICS_CHANNEL_ID) {
     if (message.attachments.size > 0) {
       try {
-        for (attachment in message.attachments.array()) {
-          let a = message.attachments.array()[attachment]
+        for (a in message.attachments) {
           console.log(`downloading ${a.name}`)
           await reactToMessage(message, '⬇️')
           const filepath = process.env.PIC_PATH + '/' + a.name
@@ -235,7 +239,7 @@ const sendRandomVideo = async (message) => {
     const results = await TikTok.find()
     let path
     let randomResult
-    for (i = 0; i < results.length; i++) {
+    for (let i = 0; i < results.length; i++) {
       randomResult = results[Math.floor(Math.random() * results.length)]
       if (
         randomResult.smallpath &&
@@ -248,7 +252,7 @@ const sendRandomVideo = async (message) => {
         randomResult.filepath &&
         (await fs.existsSync(randomResult.filepath))
       ) {
-        if (await checkFileSize(randomResult.filepath, 7.8)) {
+        if (await checkFileSize(randomResult.filepath, 7.0)) {
           console.log(`found a regular path`.yellow.inverse)
           path = randomResult.filepath
           break
@@ -264,7 +268,7 @@ const sendRandomVideo = async (message) => {
         dateConverted
       )}`
       console.log(`uploading ${path}...`)
-      await message.reply({embeds: [], files: [path]})
+      await message.reply({content: msg, files: [path]})
       await reactToMessage(message, '🎲')
       console.log(`done uploading ${path}`)
       return
