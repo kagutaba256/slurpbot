@@ -94,7 +94,8 @@ client.on('messageCreate', async (message) => {
           }
           let smallerPath = null
           if (!isNonPostable(link)) {
-            let shouldShrink = false
+            //let shouldShrink = false
+            let shouldShrink = true
             console.log(`converting ${response.filepath}`)
             if (!(await checkFileSize(response.filepath, 7.8))) {
               console.log(
@@ -156,6 +157,10 @@ client.on('messageCreate', async (message) => {
     })
     console.log(`saved ${link}`)
     await reactToMessage(message, '💾')
+  } else if (message.channel.id === process.env.MAIN_CHANNEL_ID) {
+        if (message.author.id === process.env.MEOW_REACT_TO_THIS_ID) {
+            await message.react('1009595804434059274')
+	}
   } else if (message.channel.id === process.env.PICS_CHANNEL_ID) {
     if (message.attachments.size > 0) {
       try {

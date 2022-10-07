@@ -5,6 +5,7 @@ import { promisify } from 'util'
 import { createWriteStream } from 'fs'
 import { v4 } from 'uuid'
 import ydl from 'youtube-dl-exec'
+import { getVideoDurationInSeconds } from 'get-video-duration'
 
 export const isSlurpable = (link) => {
   const li = (str) => link.includes(str)
@@ -16,6 +17,7 @@ export const isSlurpable = (link) => {
         li('twitter') ||
         li('facebook') ||
         li('reddit') ||
+        li('fb.watch') ||
         li('bilibili'))) ||
     ((li('youtube.com/watch') || li('youtu.be')) && !li('list'))
   )
@@ -32,13 +34,13 @@ export const downloadVideoWithYdl = async (link) => {
   const id = v4()
   const filename = id + '.mp4'
   const path = process.env.VIDEO_PATH
-  const cookies = process.env.COOKIES_PATH
+  //const cookies = process.env.COOKIES_PATH
   const filepath = path + '/' + filename
   console.log(`downloading ${link} to ${filepath}...`)
   await ydl(link, {
     q: true,
     o: filepath,
-    cookies,
+    //cookies,
     userAgent: 'facebookexternalhit/1.1',
   })
   return { id, filename, filepath }
@@ -63,17 +65,22 @@ export const downloadFile = async (fileUrl, outputLocationPath) => {
 }
 
 export const makeVideoSmaller = async (input, output, shrink) => {
+  const duration = await getVideoDurationInSeconds(input)
   function ffConvert() {
     return new Promise((resolve, reject) => {
       try {
         let outputOptions = []
         let slownessOptions = []
         if (shrink) {
-          outputOptions = ['-crf', '47']
+          const targetSize = 8 * 1024 * 1024 * 5.5
+          const bitrate = Math.floor(targetSize / duration)
+          console.log(`using bitrate ${bitrate}, size ${duration}, targetSize ${targetSize}`)
+          // two-pass encoding
+          outputOptions = ['-b', `${bitrate}`, '-pass', '1']
           slownessOptions = ['-preset', 'slow']
         } else {
-          outputOptions = ['-crf', '34']
-          slownessOptions = ['-preset', 'slow']
+          outputOptions = ['-crf', '32']
+          //slownessOptions = ['-preset', 'slow']
         }
         ffmpeg()
           .input(input)
